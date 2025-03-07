@@ -15,10 +15,10 @@ const blogSchema = new mongoose.Schema({
     },
     createdAt: { type: Date, default: Date.now },
     updatedAt : {type: Date, default: Date.now},
-    comments: {
+    comments: [{
         type: mongoose.Schema.Types.ObjectId, // References the Comment collection
         ref: "Comment"
-    }
+    }]
 })
 
 const blog = mongoose.model('Blog', blogSchema);

@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require("mongoose");
+var seedDatabase = require("./seeders/seed");
 
 var postsRouter = require('./routes/api/posts');
 var usersRouter = require('./routes/api/users');
@@ -50,5 +51,8 @@ const connectToDB = async ()=>{
 }
 
 connectToDB();
+
+//unCheck this if you want to seed fake data in db
+// seedDatabase();
 
 module.exports = app;
