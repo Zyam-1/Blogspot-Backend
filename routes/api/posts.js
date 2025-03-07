@@ -32,6 +32,33 @@ router.get("/:id", async(req, res)=>{
 
 router.post("/", async(req, res)=>{
     console.log(req);
+    try {
+        let blog = new Blog;
+        blog.title = req.body.title;
+        blog.content = req.body.content;
+        blog.author = req.body.author;
+        console.log(blog);
+        await blog.save();
+        return res.send(blog);
+    } catch (error) {
+        return res.send({error});
+    }
+});
+
+
+router.delete("/:id", async(req, res)=>{
+    let _id = req.params.id;
+    if(isObjectIdOrHexString(_id)){
+        let blog = await Blog.findOneAndDelete({_id});
+        if(blog){
+            return res.send(blog);
+        }else{
+            return res.status(404).send(["Blog Not Found"])
+        }
+    }
+    else{
+        return res.status(400).send(['Invalid ID format']);
+    }
 })
 
 module.exports = router;
