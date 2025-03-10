@@ -5,6 +5,8 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var seedDatabase = require("./seeders/seed");
+require("dotenv").config();
+// console.log(process.env);
 
 var postsRouter = require("./routes/api/posts");
 var usersRouter = require("./routes/api/users");
@@ -23,7 +25,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // app.use('/', indexRouter);
-app.use("/users", usersRouter);
+app.use("/api/users/", usersRouter);
 app.use("/api/blogs/", postsRouter);
 app.use("/api/comments/", commentRouter);
 
@@ -45,7 +47,7 @@ app.use(function (err, req, res, next) {
 
 const connectToDB = async () => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/BlogSport");
+    await mongoose.connect(process.env.DB_URI);
     console.log("Connection Successful");
   } catch (error) {
     console.log(error);

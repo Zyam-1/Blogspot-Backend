@@ -57,7 +57,6 @@ router.post("/:id", blogExists, async (req, res) => {
   if (!isObjectIdOrHexString(_id)) {
     return res.status(400).send(["Invalid ID"]);
   }
-
   try {
     let comment = new Comment();
     comment.blog = _id;

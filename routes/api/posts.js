@@ -4,11 +4,20 @@ const router = express.Router();
 const Blog = require("../../models/Blog");
 
 // const mongoose = require("mongoose");
-const { isObjectIdOrHexString, isValidObjectId } = require("mongoose");
+const { isObjectIdOrHexString } = require("mongoose");
 
 router.get("/", async (req, res) => {
   try {
-    let blogs = await Blog.find().populate("comments").populate("author");
+    let blogs = await Blog.find()
+      .populate({
+        path: "comments",
+        select: "content user",
+        populate: {
+          path: "user",
+          select: "name",
+        },
+      })
+      .populate("author", "name");
     return res.send(blogs);
   } catch (error) {
     return res.status(500).send(error);
@@ -21,8 +30,15 @@ router.get("/:id", async (req, res) => {
   // try catch can also be used
   if (isObjectIdOrHexString(_id)) {
     let blog = await Blog.find({ _id: _id })
-      .populate("comments")
-      .populate("author");
+      .populate({
+        path: "comments",
+        select: "content user",
+        populate: {
+          path: "user",
+          select: "name",
+        },
+      })
+      .populate("author", "name");
     if (blog.length == 0) {
       return res.status(404).send(["Blog Not Found"]);
     }
@@ -32,8 +48,10 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// only a logged in user can post a blog
+
 router.post("/", async (req, res) => {
-  console.log(req);
+  // console.log(req);
   try {
     let blog = new Blog();
     blog.title = req.body.title;
@@ -47,6 +65,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// only the author and admin can delete this
 router.delete("/:id", async (req, res) => {
   let _id = req.params.id;
   if (isObjectIdOrHexString(_id)) {
@@ -61,6 +80,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// only the author and admin can delete this
 router.patch("/:id", async (req, res) => {
   let _id = req.params.id;
   let update = req.body;
