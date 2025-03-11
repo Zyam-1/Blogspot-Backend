@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
-const Blog = require("../../models/Blog");
+const { Blog } = require("../../models/Blog");
 
 // const mongoose = require("mongoose");
 const { isObjectIdOrHexString } = require("mongoose");
@@ -109,4 +109,24 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
+//get blogs of a specific author
+
+router.get("/author/:authorID", async (req, res) => {
+  let authorID = req.params.authorID;
+  if (!authorID) {
+    return res.status(400).send(["Author ID is required"]);
+  }
+
+  if (!isObjectIdOrHexString(authorID)) {
+    res.status(400).send(["Invalid ID Format"]);
+  }
+
+  try {
+    let blogs = await Blog.find({ author: authorID });
+    return res.status(200).send(blogs);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send(["Internal Server Error"]);
+  }
+});
 module.exports = router;

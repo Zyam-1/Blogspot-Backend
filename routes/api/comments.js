@@ -3,7 +3,7 @@ const router = express.Router();
 const { isObjectIdOrHexString } = require("mongoose");
 const Comment = require("../../models/Comment");
 const blogExists = require("../../middlewares/blogExists");
-const Blog = require("../../models/Blog");
+const { Blog } = require("../../models/Blog");
 
 // get all comments from blog id
 router.get("/:id", async (req, res) => {
