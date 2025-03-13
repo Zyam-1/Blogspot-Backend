@@ -4,6 +4,8 @@ const { isObjectIdOrHexString } = require("mongoose");
 const Comment = require("../../models/Comment");
 const blogExists = require("../../middlewares/blogExists");
 const { Blog } = require("../../models/Blog");
+const authenticate = require("../../middlewares/auth");
+const checkCommentOwn = require("../../middlewares/checkCommentOwn");
 
 // get all comments from blog id
 router.get("/:id", async (req, res) => {
@@ -25,7 +27,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 // delete a specfic comment from comment id
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticate, checkCommentOwn, async (req, res) => {
   let _id = req.params.id;
   if (!_id) {
     return res.status(400).send(["Invalid ID"]);
@@ -36,7 +38,7 @@ router.delete("/:id", async (req, res) => {
   }
 
   try {
-    let comment = await Comment.findOneAndDelete({ _id });
+    let comment = await Comment.findOneAndDelete({ _id }, { new: true });
     if (!comment) {
       return res.status(404).send(["Comment not found"]);
     }
@@ -48,7 +50,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // post a comment to a blog id
-router.post("/:id", blogExists, async (req, res) => {
+router.post("/:id", authenticate, blogExists, async (req, res) => {
   let _id = req.params.id;
   if (!_id) {
     return res.status(400).send(["Invalid ID"]);

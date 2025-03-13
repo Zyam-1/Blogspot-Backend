@@ -5,6 +5,8 @@ const { Blog } = require("../../models/Blog");
 const validateBlogData = require("../../middlewares/validateBlog");
 const validateBlogPatchReq = require("../../middlewares/validateBlogPatch");
 const { isObjectIdOrHexString } = require("mongoose");
+const authenticate = require("../../middlewares/auth");
+const checkBlogOwn = require("../../middlewares/checkBlogOwn");
 
 router.get("/", async (req, res) => {
   try {
@@ -50,7 +52,7 @@ router.get("/:id", async (req, res) => {
 
 // only a logged in user can post a blog
 
-router.post("/", validateBlogData, async (req, res) => {
+router.post("/", authenticate, validateBlogData, async (req, res) => {
   // console.log(req);
   try {
     let blog = new Blog();
@@ -66,7 +68,7 @@ router.post("/", validateBlogData, async (req, res) => {
 });
 
 // only the author and admin can delete this
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticate, checkBlogOwn, async (req, res) => {
   let _id = req.params.id;
   if (isObjectIdOrHexString(_id)) {
     let blog = await Blog.findOneAndDelete({ _id });
@@ -81,37 +83,40 @@ router.delete("/:id", async (req, res) => {
 });
 
 // only the author and admin can delete this
-router.patch("/:id", validateBlogPatchReq, async (req, res) => {
-  let _id = req.params.id;
-  let update = req.body;
-  // console.log(update);
+router.patch(
+  "/:id",
+  authenticate,
+  checkBlogOwn,
+  validateBlogPatchReq,
+  async (req, res) => {
+    let _id = req.params.id;
+    let update = req.body;
+    // console.log(update);
 
-  try {
-    // check if the update is empty
-    if (Object.keys(update).length == 0) {
-      return res.status(400).send(["Can't accept an empty object"]);
-    }
-    if (isObjectIdOrHexString(_id)) {
-      let blog = await Blog.findOneAndUpdate(
-        { _id },
-        { $set: { ...update, updatedAt: new Date() } },
-        { new: true },
-      );
-      if (blog) {
-        return res.send(blog);
+    try {
+      // check if the update is empty
+      if (isObjectIdOrHexString(_id)) {
+        let blog = await Blog.findOneAndUpdate(
+          { _id },
+          { $set: { ...update, updatedAt: new Date() } },
+          { new: true },
+        );
+        if (blog) {
+          return res.send(blog);
+        }
+        return res.status(404).send(["Blog not found"]);
+      } else {
+        res.status(400).send(["Invalid ID Format"]);
       }
-      return res.status(404).send(["Blog not found"]);
-    } else {
-      res.status(400).send(["Invalid ID Format"]);
+    } catch (error) {
+      res.status(500).send(error);
     }
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+  },
+);
 
 //get blogs of a specific author
 
-router.get("/author/:authorID", async (req, res) => {
+router.get("/authors/:authorID", async (req, res) => {
   let authorID = req.params.authorID;
   if (!authorID) {
     return res.status(400).send(["Author ID is required"]);
@@ -122,8 +127,9 @@ router.get("/author/:authorID", async (req, res) => {
   }
 
   try {
+    let userInfo = await User.findOne({ _id: authorID });
     let blogs = await Blog.find({ author: authorID });
-    return res.status(200).send(blogs);
+    return res.status(200).send([userInfo, blogs]);
   } catch (error) {
     console.error(error);
     return res.status(500).send(["Internal Server Error"]);

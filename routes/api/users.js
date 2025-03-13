@@ -47,14 +47,4 @@ router.post("/login", async (req, res) => {
 
 // get all users. Only admin can access this route
 
-router.get("/all", async (req, res) => {
-  try {
-    let users = await User.find({}, "name email role");
-    return res.status(200).send(users);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send(["Internal Server Errir"]);
-  }
-});
-
 module.exports = router;

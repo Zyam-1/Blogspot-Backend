@@ -11,6 +11,7 @@ require("dotenv").config();
 var postsRouter = require("./routes/api/posts");
 var usersRouter = require("./routes/api/users");
 var commentRouter = require("./routes/api/comments");
+var adminRouter = require("./routes/api/admin");
 
 var app = express();
 
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/users/", usersRouter);
 app.use("/api/blogs/", postsRouter);
 app.use("/api/comments/", commentRouter);
+app.use("/api/admin/", adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

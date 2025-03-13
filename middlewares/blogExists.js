@@ -1,4 +1,4 @@
-const Blog = require("../models/Blog");
+const { Blog } = require("../models/Blog");
 const { isObjectIdOrHexString } = require("mongoose");
 async function blogExists(req, res, next) {
   let blogID = req.params.id;
