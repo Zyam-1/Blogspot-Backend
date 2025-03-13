@@ -2,8 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const { Blog } = require("../../models/Blog");
-
-// const mongoose = require("mongoose");
+const validateBlogData = require("../../middlewares/validateBlog");
+const validateBlogPatchReq = require("../../middlewares/validateBlogPatch");
 const { isObjectIdOrHexString } = require("mongoose");
 
 router.get("/", async (req, res) => {
@@ -50,7 +50,7 @@ router.get("/:id", async (req, res) => {
 
 // only a logged in user can post a blog
 
-router.post("/", async (req, res) => {
+router.post("/", validateBlogData, async (req, res) => {
   // console.log(req);
   try {
     let blog = new Blog();
@@ -81,10 +81,10 @@ router.delete("/:id", async (req, res) => {
 });
 
 // only the author and admin can delete this
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", validateBlogPatchReq, async (req, res) => {
   let _id = req.params.id;
   let update = req.body;
-  console.log(update);
+  // console.log(update);
 
   try {
     // check if the update is empty

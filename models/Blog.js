@@ -52,6 +52,15 @@ function validateBlog(blog) {
   return schema.validate(blog);
 }
 
+function validateBlogPatch(data) {
+  const schema = Joi.object({
+    title: Joi.string().min(2).optional(),
+    content: Joi.string().min(10).optional(),
+    author: Joi.string().optional(),
+  });
+  return schema.validate(data);
+}
+
 const Blog = mongoose.model("Blog", blogSchema);
 
-module.exports = { Blog, validateBlog };
+module.exports = { Blog, validateBlog, validateBlogPatch };
