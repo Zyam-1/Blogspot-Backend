@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var User = require("../../models/User");
+const { isObjectIdOrHexString } = require("mongoose");
 
 // register route
 router.post("/register", async function (req, res, next) {
@@ -45,6 +46,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// get all users. Only admin can access this route
+// get a specfic user. Only admin can access this route
 
 module.exports = router;

@@ -127,7 +127,10 @@ router.get("/authors/:authorID", async (req, res) => {
   }
 
   try {
-    let userInfo = await User.findOne({ _id: authorID });
+    let userInfo = await User.findOne(
+      { _id: authorID },
+      "name email createdAt",
+    );
     let blogs = await Blog.find({ author: authorID });
     return res.status(200).send([userInfo, blogs]);
   } catch (error) {
