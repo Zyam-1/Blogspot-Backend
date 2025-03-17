@@ -5,6 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var seedDatabase = require("./seeders/seed");
+var cors = require("cors");
 require("dotenv").config();
 // console.log(process.env);
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // app.use('/', indexRouter);
+app.use(cors());
 app.use("/api/users/", usersRouter);
 app.use("/api/blogs/", postsRouter);
 app.use("/api/comments/", commentRouter);
